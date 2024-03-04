@@ -1,0 +1,41 @@
+library(wooldridge)
+data(gpa1)
+library(rmarkdown)
+paged_table(gpa1)
+
+
+coklureg <- lm(colGPA~ hsGPA+ACT,data = gpa1)
+summary(coklureg)
+
+
+library(plotly)
+plot_ly(data = gpa1, z = ~colGPA, x = ~hsGPA, y = ~ACT, opacity = 0.5) %>%
+  add_markers()
+
+
+
+cf.mod <- coef(coklureg)
+
+
+hsGPA <- seq(min(gpa1$hsGPA), max(gpa1$hsGPA), length.out = 50)
+ACT <- seq(min(gpa1$ACT), max(gpa1$ACT), length.out = 50)
+
+colGPA <- t(outer(hsGPA, ACT, function(x, y) cf.mod[1] + cf.mod[2] * x + cf.mod[3] * y))
+
+
+p <- plot_ly(x = ~hsGPA, y = ~ACT, z = ~colGPA, type = "surface") %>%
+
+
+
+    add_trace(
+        data = gpa1,
+        x = gpa1$hsGPA,
+        y = gpa1$ACT,
+        z = gpa1$colGPA,
+        mode = "markers",
+        type = "scatter3d",
+        opacity = 0.5
+    )
+
+
+p
